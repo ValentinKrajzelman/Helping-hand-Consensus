@@ -97,7 +97,7 @@ const causes: Cause[] = [
   },
   {
     id: 4,
-    name: "Hunger in Haiti",
+    name: "Earthquake in Haiti",
     value: 95,
     color: "#B3B3B3",
     activeColor: "#6A0572",
@@ -105,7 +105,7 @@ const causes: Cause[] = [
   },
   {
     id: 5,
-    name: "Lack of Drinking Water in Ethiopia",
+    name: "Endemic poverty in the Congo",
     value: 110,
     color: "#9E9E9E",
     activeColor: "#1A535C",
@@ -116,23 +116,29 @@ const causes: Cause[] = [
 // Componente de gráfico de torta estático con texto cambiante
 const StaticPieChartWithText = ({ selectedCauses }: { selectedCauses: number[] }) => {
   const [messageIndex, setMessageIndex] = useState(0)
-  const [key, setKey] = useState(0) // Para forzar la re-renderización de la animación
+  const [key, setKey] = useState(0)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Mensajes que se mostrarán cíclicamente
   const messages = [
     "Find your cause",
-    "War in Ukraine",
-    "Hamas War",
-    "Flood in Bahía Blanca",
-    "Hunger in Haiti",
-    "Lack of Drinking Water in Ethiopia",
+    ...causes.map(cause => cause.name)
   ]
 
-  // Duración de cada mensaje en milisegundos
-  const getDuration = (index: number) => {
-    return index === 0 ? 2000 : 1500
-  }
+  useEffect(() => {
+    const nextMessage = () => {
+      setMessageIndex((prevIndex) => (prevIndex + 1) % messages.length)
+      setKey((k) => k + 1)
+    }
+
+    timerRef.current = setInterval(nextMessage, 2000)
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+      }
+    }
+  }, [messages.length])
 
   // Calcular el total para los porcentajes
   const total = causes.reduce((sum, entry) => sum + entry.value, 0)
@@ -153,30 +159,6 @@ const StaticPieChartWithText = ({ selectedCauses }: { selectedCauses: number[] }
   }
 
   const angles = getAngles()
-
-  // Animación cíclica para cambiar el mensaje
-  useEffect(() => {
-    const nextMessage = () => {
-      setMessageIndex((prevIndex) => {
-        const newIndex = (prevIndex + 1) % messages.length
-        setKey((k) => k + 1) // Forzar re-renderización de la animación
-
-        // Programar el siguiente cambio según la duración del mensaje actual
-        timerRef.current = setTimeout(nextMessage, getDuration(newIndex))
-
-        return newIndex
-      })
-    }
-
-    // Iniciar el primer temporizador
-    timerRef.current = setTimeout(nextMessage, getDuration(0))
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-      }
-    }
-  }, [messages.length])
 
   // Convertir ángulos a radianes
   const degToRad = (deg: number) => (deg * Math.PI) / 180
@@ -278,7 +260,7 @@ const PlusOneAnimation = ({ x, y }: { x: number; y: number }) => {
         fontWeight: "bold",
       }}
     >
-      +1 USD
+      +1 voto
     </div>
   )
 }
@@ -303,14 +285,16 @@ const VotingPage = ({
 
     // Crear animación en la posición del clic
     const rect = e.currentTarget.getBoundingClientRect()
-    setAnimations((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        x: rect.x - 20,
-        y: rect.y - 30,
-      },
-    ])
+    if (!selectedCauses.includes(id)) {
+      setAnimations((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          x: rect.x - 20,
+          y: rect.y - 30,
+        },
+      ])
+    }
   }
 
   return (
@@ -374,31 +358,33 @@ export default function MobileScreen() {
   }
 
   return (
-    <div className="mx-auto bg-white font-sans" style={{ width: "1080px", height: "1920px", maxWidth: "100%" }}>
+    <div className="h-screen w-screen overflow-hidden bg-white font-sans flex flex-col">
       {!showVotingPage ? (
         <>
           {/* Header with wallet address */}
-          <header className="p-6">
-            <div className="text-right text-sm font-medium text-gray-700 font-manrope">0x0123SD32</div>
+          <header className="p-4 flex items-center justify-end">
+            <div className="inline-flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-3 py-1.5 rounded-full shadow-sm text-sm font-medium">
+              <span>300.00 WDD</span>
+            </div>
           </header>
 
           {/* Main content */}
-          <main className="px-6 flex flex-col items-center">
+          <main className="flex-1 flex flex-col px-4">
             {/* Main amount display */}
-            <div className="mb-8 text-center w-full">
-              <h1 className="mb-4 text-4xl font-bold font-poppins">3 USD</h1>
-              {/* Shorter, subtle divider line */}
-              <div className="mx-auto h-px w-24 bg-gray-300 mb-4"></div>
-              <p className="text-lg font-manrope">Staked: 1,6 USD</p>
+            <div className="flex-none text-center mb-4">
+              <p className="text-sm font-manrope">Staked: </p>
+              <h1 className="text-3xl font-bold font-poppins">87 WDD</h1>
+              <div className="mx-auto text-xs h-px w-24 bg-gray-300 mt-2">Distributed: 0.87 WDD /day</div>
             </div>
 
             {/* Pie chart with changing text */}
-            <div className="flex justify-center mb-8">
+            <div className="flex-1 flex flex-col items-center justify-center min-h-0">
+              <div className="text-xl font-bold font-manrope mb-4">Current issues</div>
               <StaticPieChartWithText selectedCauses={selectedCauses} />
             </div>
 
-            {/* Vote button - centered with just enough width for the text */}
-            <div className="flex justify-center mb-8">
+            {/* Vote button - fixed at bottom */}
+            <div className="flex-none flex justify-center mb-6">
               <Button onClick={handleVote} radius="md" size="md" variant="primary">
                 Votar
               </Button>
