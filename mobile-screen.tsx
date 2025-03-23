@@ -374,11 +374,11 @@ export default function MobileScreen() {
             <div className="flex-none text-center mb-4">
               <p className="text-sm font-manrope">Staked: </p>
               <h1 className="text-3xl font-bold font-poppins">87 WDD</h1>
-              <div className="mx-auto text-xs h-px bg-gray-300 mb-2">Distributed: 0.87 WDD /day</div>
+              <div className="mx-auto text-xs h-px w-36 bg-gray-300 mt-2">Distributed: 0.87 WDD /day</div>
             </div>
 
             {/* Pie chart with changing text */}
-            <div className="flex-1 flex flex-col items-center mt-2 justify-center min-h-0">
+            <div className="flex-1 flex flex-col items-center justify-center min-h-0">
               <div className="text-lg font-bold font-manrope mb-4">Current issues</div>
               <StaticPieChartWithText selectedCauses={selectedCauses} />
             </div>
