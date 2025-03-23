@@ -374,7 +374,7 @@ export default function MobileScreen() {
             <div className="flex-none text-center mb-4">
               <p className="text-sm font-manrope">Staked: </p>
               <h1 className="text-3xl font-bold font-poppins">87 WDD</h1>
-              <div className="text-xs h-px w-24 bg-gray-300 mt-2">Distributed: 0.87 WDD /day</div>
+              <div className="mx-auto text-xs h-px bg-gray-300 mb-2">Distributed: 0.87 WDD /day</div>
             </div>
 
             {/* Pie chart with changing text */}
@@ -386,7 +386,7 @@ export default function MobileScreen() {
             {/* Vote button - fixed at bottom */}
             <div className="flex-none flex justify-center mb-6">
               <Button onClick={handleVote} radius="md" size="md" variant="primary">
-                Votar
+                Vote
               </Button>
             </div>
           </main>
